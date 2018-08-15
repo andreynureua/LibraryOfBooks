@@ -1,0 +1,173 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <title>Journals</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.4.0/jszip.min.js"></script>
+</head>
+<body>
+    <h1 style="text-align:center">Журналы</h1>
+    <div id="grid"></div>
+    <script>
+        $(document).ready(function () {
+            dataSource = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: "../api/JournalApi/Data",
+                        dataType: "json"
+                    },
+                    update: {
+                        url: "../api/JournalApi/Update",
+                        dataType: "json",
+                    },
+                    destroy: {
+                        url: "../api/JournalApi/Delete",
+                        dataType: "json",
+                    },
+                    create: {
+                        url: "../api/JournalApi/Create",
+                        dataType: "json",
+
+                    },
+                    parameterMap: function (options, operation) {
+                        if (operation !== "read" && options.models) {
+                            return { models: kendo.stringify(options.models) };
+                        }
+                    }
+                },
+                batch: true,
+                pageSize: 20,
+                schema: {
+                    model: {
+                        id: "Id",
+                        fields: {
+                            Id: { editable: false, nullable: true },
+                            Name: { validation: { required: true } },
+                            Authors: { validation: { required: true } },
+                            PublishingHouses: { validation: { required: true } },
+                            Date: { type: "date", validation: { required: true, min: 1 } },
+                        }
+                    }
+                }
+            });
+
+            $("#grid").kendoGrid({
+                dataSource: dataSource,
+                navigatable: true,
+                pageable: true,
+                toolbar: ["create", "save", "cancel", "excel"],
+                excel: {
+                    fileName: "ExportJournals.xlsx",
+                    allPages: true
+                },
+                excelExport: function (e) {
+                    for (var x = 0; x < e.workbook.sheets.length; x++) {
+                        var sheet = e.workbook.sheets[x];
+                        for (var i = 1; i < sheet.rows.length; i++) {
+                            sheet.rows[i].cells[2].value = AuthorsToStr(sheet.rows[i].cells[2]);
+                            sheet.rows[i].cells[3].value = PublishingHousesToStr(sheet.rows[i].cells[3]);
+                        }
+                    }
+                },
+                columns: [
+                    { field: "Id", title: "Id", width: 50 },
+                    "Name",
+                    { field: "Authors", title: "Authors", template: "#=  GetAuthors(Authors).join(', ') #", editor: AuthorsEditor },
+                    { field: "PublishingHouses", title: "Publishing Houses", template: "#=  GetPublishingHouses(PublishingHouses).join(', ') #", editor: PublishingHousesEditor },
+                    { field: "Date", title: "Date", width: 120, format: "{0:MM-dd-yyyy}" },
+                    { command: "destroy", title: "&nbsp;", width: 150 }],
+                editable: true
+            });
+        });
+
+
+        function AuthorsEditor(container, options) {
+            $("<select multiple='multiple' data-bind='value : Authors'/>")
+                .appendTo(container)
+                .kendoMultiSelect({
+                    dataTextField: "FullName",
+                    dataValueField: "Id",
+                    autoBind: false,
+                    dataSource: {
+                        serverFiltering: true,
+                        transport: {
+                            read: {
+                                url: "../api/AuthorApi/Data",
+                                dataType: "json"
+                            }
+                        }
+                    },
+                });
+        }
+
+        function PublishingHousesEditor(container, options) {
+            $("<select multiple='multiple' data-bind='value : PublishingHouses'/>")
+                .appendTo(container)
+                .kendoMultiSelect({
+                    dataTextField: "Name",
+                    dataValueField: "Id",
+                    autoBind: false,
+                    dataSource: {
+                        serverFiltering: true,
+                        transport: {
+                            read: {
+                                url: "../api/PublishingHouseApi/Data",
+                                dataType: "json"
+                            }
+                        }
+                    },
+                });
+        }
+
+        function PublishingHousesToStr(object) {
+            var str = "";
+            for (var x = 0; x < object.value.length; x++) {
+                if (x == object.value.length - 1) {
+                    str += object.value[x].Name;
+                }
+                else str += object.value[x].Name + ", ";
+
+            }
+            return str;
+        }
+
+        function AuthorsToStr(object) {
+            var str = "";
+            for (var x = 0; x < object.value.length; x++) {
+                if (x == object.value.length - 1) {
+                    str += object.value[x].FullName;
+                }
+                else str += object.value[x].FullName + ", ";
+
+            }
+            return str;
+        }
+
+        function GetAuthors(object) {
+            var ar = [];
+            for (var x = 0; x < object.length; x++) {
+                for (var key in object[x]) {
+                    if (key == "FullName") {
+                        ar[x] = object[x][key];
+                    }
+                }
+            }
+            return ar;
+        }
+
+        function GetPublishingHouses(object) {
+            var ar = [];
+            for (var x = 0; x < object.length; x++) {
+                for (var key in object[x]) {
+                    if (key == "Name") {
+                        ar[x] = object[x][key];
+                    }
+                }
+            }
+            return ar;
+        }
+
+    </script>
+</body>

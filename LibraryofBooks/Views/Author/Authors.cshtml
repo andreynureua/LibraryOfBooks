@@ -1,0 +1,77 @@
+﻿@model IEnumerable<LibraryofBooks.ViewModels.AuthorViewModel>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Authors</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.4.0/jszip.min.js"></script>
+</head>
+<body>
+    <h1 style="text-align:center">Авторы</h1>
+    <div id="grid"></div>
+    <script>
+        $(document).ready(function () {
+            dataSource = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: "../api/AuthorApi/Data",
+                        dataType: "json"
+                    },
+                    update: {
+                        url: "../api/AuthorApi/Update",
+                        dataType: "json",
+                    },
+                    destroy: {
+                        url: "../api/AuthorApi/Delete",
+                        dataType: "json",
+                    },
+                    create: {
+                        url: "../api/AuthorApi/Create",
+                        dataType: "json",
+
+                    },
+                    parameterMap: function (options, operation) {
+                        if (operation !== "read" && options.models) {
+                            return { models: kendo.stringify(options.models) };
+                        }
+                    }
+                },
+                batch: true,
+                pageSize: 20,
+                schema: {
+                    model: {
+                        id: "Id",
+                        fields: {
+                            Id: { editable: false, nullable: true },
+                            Name: { validation: { required: true } },
+                            Surname: { validation: { required: true } },
+                   
+                        }
+                    }
+                }
+            });
+
+            $("#grid").kendoGrid({
+                dataSource: dataSource,
+                navigatable: true,
+                pageable: true,
+                toolbar: ["create", "save", "cancel", "excel"],
+                excel: {
+                    fileName: "ExportAuthors.xlsx",
+                    allPages: true
+                },
+                columns: [
+                    { field: "Id", title: "Id", width: 50},
+                    "Name",
+                    "Surname",
+                    { command: "destroy", title: "&nbsp;", width: 150 }],
+                editable: true
+            });
+        });
+
+    </script>
+</body>
+</html>

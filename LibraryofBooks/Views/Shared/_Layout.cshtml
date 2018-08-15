@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="stylesheet" href="~/Content/kendo/kendo.common.min.css" />
+    <link rel="stylesheet" href="~/Content/kendo/kendo.default.min.css" />
+    <link rel="stylesheet" href="~/Content/kendo/kendo.default.mobile.min.css" />
+    <script src="~/Scripts/kendoScripts/jquery.js"></script>
+    <script src="~/Scripts/kendoScripts/kendo.all.min.js"></script>
+
+    <link href="~/content/LayoutTemplates/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://kendo.cdn.telerik.com/2018.1.221/styles/kendo.blueopal.min.css" />
+    <script src="~/Scripts/LayoutScripts/bootstrap.bundle.min.js"></script>
+    <link href="~/content/LayoutTemplates/simple-sidebar.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+        <a href="#menu-toggle" class="btn btn-secondary " id="menu-toggle">Menu</a>
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="../Home/Index">
+                        Main
+                    </a>
+                </li>
+                <li>
+                    <a href="../Book/Books">Books</a>
+                </li>
+                <li>
+                    <a href="../Journal/Journals">Journals</a>
+                </li>
+                <li>
+                    <a href="../Newspaper/Newspapers">Newspapers</a>
+                </li>
+                <li>
+                    <a href="../Author/Authors">Authors</a>
+                </li>
+                <li>
+                    <a href="../PublishingHouse/PublishingHouses">PublishingHouses</a>
+                </li>
+                <li>
+                    <a href="../Home/Search">Search</a>
+                </li>
+                <li>
+                    <a href="../Account/Logout">Logout</a>
+                </li>
+            </ul>
+
+        </div>
+
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                @RenderBody()
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        $("#menu-toggle").click(function (e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+        });
+    </script>
+</body>
+
+</html>

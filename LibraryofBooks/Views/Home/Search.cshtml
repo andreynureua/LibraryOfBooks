@@ -1,0 +1,112 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    <title>Search</title>
+</head>
+<body>
+    <div>
+        <h1 style="text-align:center">Search</h1>
+        <label for="dropdownlist">Select a one Publishing House for search  </label>
+        <input id="dropdownlist" style="margin: 15px" />
+        <div id="grid"></div>
+    </div>
+    <script>
+
+        $(document).ready(function () {
+            $("#dropdownlist").kendoDropDownList({
+                dataTextField: "Name",
+                dataValueField: "Id",
+                dataSource: {
+                    transport: {
+                        read: {
+                            url: "../api/PublishingHouseApi/Data",
+                            dataType: "json"
+                        },
+                    }
+                }
+            });
+        });
+        Table(1);
+
+        function dropdownlist_select(e) {
+
+            var itemId = e.dataItem.Id;
+            Table(itemId);
+        }
+
+        $(document).ready(function () {
+            $("#dropdownlist").data("kendoDropDownList").bind("select", dropdownlist_select);
+        });
+
+
+
+        function GetAuthors(object) {
+            var ar = [];
+            for (var x = 0; x < object.length; x++) {
+                for (var key in object[x]) {
+                    if (key == "FullName") {
+                        ar[x] = object[x][key];
+                    }
+                }
+            }
+            return ar;
+        }
+
+        function GetPublishingHouses(object) {
+            var ar = [];
+            for (var x = 0; x < object.length; x++) {
+                for (var key in object[x]) {
+                    if (key == "Name") {
+                        ar[x] = object[x][key];
+                    }
+                }
+            }
+            return ar;
+        }
+
+        function Table(id) {
+            $(document).ready(function () {
+                dataSource = new kendo.data.DataSource({
+                    serverFiltering: true,
+                    transport: {
+                        read: {
+                            url: "/Home/Data/"+id,
+                            dataType: "json"
+                        }
+                    },
+                    batch: true,
+                    pageSize: 20,
+                    schema: {
+                        model: {
+                            fields: {
+                                Id: { editable: false, nullable: true },
+                                Type: { editable: false, nullable: true },
+                                Name: { editable: false, nullable: true },
+                                Authors: { editable: false, nullable: true },
+                                PublishingHouses: { editable: false, nullable: true },
+                                Date: { type: "date", editable: false, nullable: true },
+                            }
+                        }
+                    }
+                });
+
+                $("#grid").kendoGrid({
+                    dataSource: dataSource,
+                    navigatable: true,
+                    pageable: true,
+                    columns: [
+                        { field: "Id", title: "Id", width: 50 },
+                        "Type",
+                        "Name",
+                        { field: "Authors", title: "Authors", template: "#=  GetAuthors(Authors).join(', ') #" },
+                        { field: "PublishingHouses", title: "Publishing Houses", template: "#=  GetPublishingHouses(PublishingHouses).join(', ') #" },
+                        { field: "Date", title: "Date", width: 120, format: "{0:MM-dd-yyyy}" }],
+                    editable: true
+                });
+            });
+        }
+    </script>
+
+</body>
